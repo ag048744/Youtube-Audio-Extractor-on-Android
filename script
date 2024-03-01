@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+
+previous_count=$(find . -type f | wc -l)
+while true; do
+	read -p "Type URL to extract audio from (Type 'exit' to stop): " url
+	if [ "$url" == "exit" ]; then
+		break
+	fi
+	yt-dlp.sh -x "$url" --quiet -o "%(channel)s/%(title)s (%(id)s).%(ext)s" --download-archive downloaded.txt >/dev/null
+	current_count=$(find . -type f | wc -l)
+	if [ $current_count -gt $previous_count ]; then
+		echo "Extracted audio"
+		#termux-media-scan -r "$(pwd)" >/dev/null
+		echo "Audio Library Updated"
+		previous_count=$current_count
+	elif [ $current_count -eq $previous_count ]; then
+		echo "Error extracting audio or already previously extracted."
+	fi
+done
